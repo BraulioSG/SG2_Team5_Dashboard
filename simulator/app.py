@@ -38,6 +38,6 @@ class App:
 
 print("Production Line, Approved items, Rejected items, Total items, Work Station, Avg. Fixing time, Avg. Supplying "
           "time, Avg. Production Time WS, Avg. Production time PL, Day")
-for i in range(20):
+for i in range(100):
     app = App(i + 1)
     app.start(1000)
