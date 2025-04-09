@@ -1,0 +1,16 @@
+---
+import * as d3 from 'd3';
+
+const { width, height } = Astro.props;
+---
+
+<svg id="chart_area" width={width} height={height}></svg> 
+
+<script>
+    const svg = d3.select("#chart_area");
+    svg.append('circle')
+        .attr('cx', 150)
+        .attr('cy', 150)
+        .attr('r', 70)
+        .style('fill', 'tomato');
+</script>
