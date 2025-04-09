@@ -28,6 +28,7 @@ class WorkStation(object):
         self._fixing_times = list()
         self._supplying_times = list()
         self._production_times = list()
+        self._down_time = 0
         self._process = None
 
     def get_id(self):
@@ -36,23 +37,26 @@ class WorkStation(object):
     def is_busy(self) -> bool:
         return self._busy
 
-    def get_avg_fixing_time(self) -> int:
+    def get_avg_fixing_time(self) -> float:
         if len(self._fixing_times) == 0:
             return 0.0
 
         return sum(self._fixing_times) / len(self._fixing_times)
 
-    def get_avg_supplying_time(self) -> int:
+    def get_avg_supplying_time(self) -> float:
         if len(self._supplying_times) == 0:
             return 0.0
 
         return sum(self._supplying_times) / len(self._supplying_times)
 
-    def get_avg_production_time(self) -> int:
+    def get_avg_production_time(self) -> float:
         if len(self._production_times) == 0:
             return 0.0
 
         return sum(self._production_times) / len(self._production_times)
+
+    def get_down_time(self) -> float:
+        return sum(self._fixing_times) + sum(self._supplying_times)
 
     def get_process(self):
         return self._process

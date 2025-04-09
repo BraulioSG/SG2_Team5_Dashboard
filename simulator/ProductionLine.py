@@ -21,6 +21,7 @@ class ProductionLine(object):
         self._ongoing_items = list()
         self._approved_items = 0
         self._rejected_items = 0
+        self._stop_time = 0
 
     def get_action(self):
         return self._action
@@ -93,6 +94,8 @@ class ProductionLine(object):
                 ws_process.interrupt()
             ws.interrupt_ws()
 
+        self._stop_time = self._env.now
+
     def print_report(self) -> None:
         total_items = self._approved_items + self._rejected_items
         fixing_times = list()
@@ -110,7 +113,9 @@ class ProductionLine(object):
 
     def print_for_csv(self):
         total_items = self._approved_items + self._rejected_items
+
         for ws in self._work_stations:
+            downtime = self._stop_time + ws.get_down_time()
             line = (f"{self._id}, {self._approved_items}, {self._rejected_items}, {total_items}, {ws.get_id()}, "
-                    f"{ws.get_avg_fixing_time()}, {ws.get_avg_supplying_time()}, {ws.get_avg_production_time()}, {self.get_avg_time()}")
+                    f"{ws.get_avg_fixing_time()}, {ws.get_avg_supplying_time()}, {ws.get_avg_production_time()}, {self.get_avg_time()}, {downtime}")
             print(line)
