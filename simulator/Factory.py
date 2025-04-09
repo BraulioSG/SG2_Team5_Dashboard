@@ -6,12 +6,13 @@ class Factory(object):
     """ Class Representation for the Factory
     it handles all production lines and suppliers
     """
-    def __init__(self, env: simpy.Environment, app, num_suppliers:int = 3) -> None:
+    def __init__(self, env: simpy.Environment, day, app, num_suppliers:int = 3) -> None:
         self._env = env
         self._production_lines = list()
         self._app = app
         self._suppliers = simpy.Resource(self._env, capacity=num_suppliers)
         self._action = None
+        self.day = day
 
     def start(self) -> None: 
         if len(self._production_lines) < 1:
@@ -59,4 +60,4 @@ class Factory(object):
     def print_for_csv(self) -> None:
         """ Prints the results of the simulation in csv format """
         for pl in self._production_lines:
-            pl.print_for_csv()
+            pl.print_for_csv(self.day)

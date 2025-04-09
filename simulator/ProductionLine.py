@@ -111,11 +111,12 @@ class ProductionLine(object):
             print(f"\tRejected items: {self._rejected_items} ({(self._rejected_items/total_items)*100}%)")
         print(f"\ttotal items: {self._approved_items + self._rejected_items}")
 
-    def print_for_csv(self):
+    def print_for_csv(self, day):
         total_items = self._approved_items + self._rejected_items
 
         for ws in self._work_stations:
             downtime = self._stop_time + ws.get_down_time()
             line = (f"{self._id}, {self._approved_items}, {self._rejected_items}, {total_items}, {ws.get_id()}, "
-                    f"{ws.get_avg_fixing_time()}, {ws.get_avg_supplying_time()}, {ws.get_avg_production_time()}, {self.get_avg_time()}, {downtime}")
+                    f"{ws.get_avg_fixing_time()}, {ws.get_avg_supplying_time()}, {ws.get_avg_production_time()}, "
+                    f"{self.get_avg_time()}, {day}, {downtime}")
             print(line)
