@@ -34,7 +34,7 @@ var t = d3.transition(1)
 
 var day = 0;
 
-d3.csv("simulator/output.csv", d => {
+d3.csv("/data/results.csv", d => {
 	return {
 		...d,
 		" Total items": +d[" Total items"],
