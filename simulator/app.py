@@ -36,8 +36,8 @@ class App:
         #print("ALARM!!")
 
 
-print("Production Line, Approved items, Rejected items, Total items, Work Station, Avg. Fixing time, Avg. Supplying "
-          "time, Avg. Production Time WS, Avg. Production time PL, Day, Downtime")
+print("Production Line,Approved items,Rejected items,Total items,Work Station,Avg. Fixing time,Avg. Supplying "
+          "time,Avg. Production Time WS,Avg. Production time PL,Day,Downtime")
 for i in range(100):
     app = App(i + 1)
     app.start(1000)
