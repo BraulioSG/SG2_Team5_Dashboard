@@ -12,7 +12,11 @@ const { width, height } = Astro.props;
 
     const HEIGHT = height - margin.top - margin.bottom;
     const WIDTH = width - margin.left - margin.right;
-    
+    const tooltip = d3.select("#downtime-graph").append("div")
+        .style("position", "absolute")
+        .style("visibility", "hidden")
+        .attr("class", "tooltip");
+
     let x = d3.scaleLinear().range([WIDTH, 0]);
     let y = d3.scaleBand().range([HEIGHT, 0]).paddingOuter(0.1).paddingInner(0.1);
 
@@ -28,7 +32,7 @@ const { width, height } = Astro.props;
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
         .style("fill", d3.color(Colors.BLACK))
-        .text("Top 10 Days With Downtimes");
+        .text("Top 20 Days With Downtimes");
         
     const dayLabel = group.append("text").attr("class", "label")
         .attr("x", WIDTH)
@@ -78,10 +82,12 @@ const { width, height } = Astro.props;
 
             const data = Object.values(daysDowntime);
             const sliced = data.slice(0, idx + 1);
+            
             const sorted = sliced.sort((a,b) => {
-                return a.downtime - b.downtime
+                return b.downtime - a.downtime
             });
-            updateData(sorted.slice(0, Math.min(idx, 10)));
+
+            updateData(sorted.slice(0, Math.min(idx, 20)));
             numDayLabel.text(idx + 1);
             idx++;
             if(idx >= data.length){
@@ -90,6 +96,7 @@ const { width, height } = Astro.props;
         }, 1000);
 
     })()
+
 
     function updateData(data){
         let maxDowntime = 0;
@@ -101,10 +108,11 @@ const { width, height } = Astro.props;
         })
 
 
-        x.domain([maxDowntime, 0]);
-        y.domain(names);
 
-        const tran = d3.transition().duration(500);
+        x.domain([maxDowntime, 0]);
+        y.domain(names.reverse());
+
+        const tran = d3.transition().duration(1000);
         const rects = group.selectAll("rect").data(data);
         
         rects.exit().transition(tran).remove();
@@ -120,13 +128,27 @@ const { width, height } = Astro.props;
             .attr("x", margin.left + 2)
             .attr("width", (d) => { return x(d.downtime)}) 
             .attr("height", y.bandwidth())
-            .attr("fill", d3.color(Colors.BLUE));
+            .attr("id", (d, idx) => { return `Downtime-bar-${idx}`})
+            .attr("fill", (d) => { return d.downtime === maxDowntime ? d3.color(Colors.GREEN) : d3.color(Colors.BLUE)});
 
         const xAxisCall = d3.axisBottom(x).ticks(4);
         const yAxisCall = d3.axisLeft(y).tickValues(names);
 
         xAxisGroup.transition(tran).call(xAxisCall);
         yAxisGroup.transition(tran).call(yAxisCall);
-        
+
+        data.forEach((entry, idx) => { 
+            const bar = d3.select(`#Downtime-bar-${idx}`)
+                .on("mouseover", function(){
+                    return tooltip.html(`<strong>${entry.day}</strong></br><p>${Math.round(entry.downtime * 100) / 100}</p>`).style("visibility", "visible");
+                })
+                .on("mousemove", function(){
+                    console.log(event);
+                    return tooltip.style("top", (event.pageY-1105)+"px").style("left",(event.pageX-105)+"px");
+                })
+                .on("mouseout", function(){
+                    return tooltip.style("visibility", "hidden");
+                });
+        })         
     }
 </script>

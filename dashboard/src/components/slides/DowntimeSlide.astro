@@ -3,6 +3,11 @@ import Slide from "../../layouts/Slide.astro";
 import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
 ---
 <style is:global>
+    .tooltip{
+        background: white;
+        border: 1px solid black;
+        padding: 10px;
+    }
     #DowntimeSlide{
         width: 100%;
         height: 100%;
@@ -13,7 +18,7 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
         position: relative;
     }
 
-    #DowntimeSlide div{
+    #DowntimeSlide .info, #DowntimeSlide .graphics{
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -37,11 +42,9 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
 
     #DowntimeSlide .info .info-summary .entries{
         height: 100%;
+        max-height: 100%;
         width: 100%;
-        overflow-y: auto;
-        display:flex;
-        flex-direction: column;
-        justify-content: flex-end;
+        overflow-y: scroll;
     }
     #DowntimeSlide .graphics{
         width: 50%;
@@ -96,11 +99,13 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
 
     @keyframes showup{
         from{
-            transform: translateY(100%);
+            opacity: 0;
+            transform: translateY(-50%) scale(0.5);
         }
         to{
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0%);
+        }
         }
     }
 </style>
@@ -114,7 +119,7 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
             </div>
         </div>
         <div class="graphics">
-            <DowntimeGraph  width={500} height={500}/>
+            <DowntimeGraph  width={500} height={600}/>
         </div>
     </main>
 </Slide>
@@ -125,24 +130,26 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
 
     function addInfoEntry(ws1, ws2, ws3, ws4, ws5, ws6){
         const sum = (+ws1.Downtime) + (+ws2.Downtime) + (+ws3.Downtime)+ (+ws4.Downtime) + (+ws5.Downtime) + (+ws6.Downtime);
-        infoSummary.innerHTML += `
-            <div class="info-entry">
-                <div class="info-entry-day">
-                    <p>Day</p>
-                    <h3>${ws1.Day}</h3>
-                </div> 
-                <div class="info-entry-data">
-                    <p>WorkStation 1: <span>${Math.round(ws1.Downtime * 100) / 100}</span></p>
-                    <p>WorkStation 2: <span>${Math.round(ws2.Downtime * 100) / 100}</span></p>
-                    <p>WorkStation 3: <span>${Math.round(ws3.Downtime * 100) / 100}</span></p>
-                    <p>WorkStation 4: <span>${Math.round(ws4.Downtime * 100) / 100}</span></p>
-                    <p>WorkStation 5: <span>${Math.round(ws5.Downtime * 100) / 100}</span></p>
-                    <p>WorkStation 6: <span>${Math.round(ws6.Downtime * 100) / 100}</span></p>
-                    <hr>
-                    <p><strong>Total: </strong><span>${Math.round(sum * 100) / 100}</span></p>
-                </div>
+        const newEntry = document.createElement("div");
+        newEntry.classList.add("info-entry");
+        newEntry.innerHTML = `
+            <div class="info-entry-day">
+                <p>Day</p>
+                <h3>${ws1.Day}</h3>
+            </div> 
+            <div class="info-entry-data">
+                <p>WorkStation 1: <span>${Math.round(ws1.Downtime * 100) / 100}</span></p>
+                <p>WorkStation 2: <span>${Math.round(ws2.Downtime * 100) / 100}</span></p>
+                <p>WorkStation 3: <span>${Math.round(ws3.Downtime * 100) / 100}</span></p>
+                <p>WorkStation 4: <span>${Math.round(ws4.Downtime * 100) / 100}</span></p>
+                <p>WorkStation 5: <span>${Math.round(ws5.Downtime * 100) / 100}</span></p>
+                <p>WorkStation 6: <span>${Math.round(ws6.Downtime * 100) / 100}</span></p>
+                <hr>
+                <p><strong>Total: </strong><span>${Math.round(sum * 100) / 100}</span></p>
             </div>
-        `
+        `;
+        infoSummary.appendChild(newEntry);
+        infoSummary.scrollTop = infoSummary.scrollHeight;
     }
     (async ()=>{
        const raw = await d3.csv("/data/results.csv")

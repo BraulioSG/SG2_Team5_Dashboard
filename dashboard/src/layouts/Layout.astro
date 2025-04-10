@@ -23,6 +23,7 @@
         --orange: #F4A259;
         --yellow: #F4E285;
         --green: #8CB369;
+        interpolate-size: allow-keywords;
     }
 
     *{
@@ -55,11 +56,12 @@
     ::-webkit-scrollbar-thumb {
       background: var(--blue); 
       border-radius: 10px;
+      transition: all 0.3s ease;
     }
 
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
-      background: #b30000; 
+      background: var(--green); 
     }
 
     .chart-container{
