@@ -1,0 +1,42 @@
+<style>
+    .slide{
+        height: 100%;
+        width: 100%;
+        display: grid;
+        place-content: center;
+        animation-name: slide-in;
+        animation-duration: 2s;
+    }
+
+    .slide.disabled{
+        display: none;
+        animation-name: disappear;
+        animation-duration: 2s;
+        transform: translateX(-100%);
+    }
+
+    @keyframes slide-in{
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        to{
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slide-out{
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to{
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+    }
+</style>
+<section class="slide">
+    <slot>
+</section>

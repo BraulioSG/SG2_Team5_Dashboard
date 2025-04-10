@@ -1,9 +1,85 @@
+---
+import Slide1 from "./slides/Slide1.astro";
+---
+
 <style>
     #slides-section{
         width: 100vw;
-        height: 100vh;
+        height: 100vh; 
+        display: flex;
+        flex-direction: column;
+    }
+
+    #slides-section .tabs{
+        width: 100dvw;
+        height: fit-content;
+        background: #eee;
+        display: flex;
+        overflow-x: auto;
+    }
+
+    button.btn-tab{
+        height: fit-content;
+        min-width: fit-content;
+        padding: 10px 20px;
+        border: none;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    button.btn-tab.active{
+        background: var(--blue);
+        color: white;
+    }
+    button:not(.active).btn-tab:hover{
+        cursor: pointer;
+        background: #dfdfdf;
     }
 </style>
+
 <section id="slides-section">
+    <div class="tabs">
+        <button class="btn-tab active">Slide 1</button>
+        <button class="btn-tab">Slide 2</button>
+        <button class="btn-tab">Slide 3</button>
+        <button class="btn-tab">Slide 4</button>
+        <button class="btn-tab">Slide 5</button>
+        <button class="btn-tab">Slide 6</button>
+    </div>
+
+    <Slide1 />
+    <Slide1 />
+    <Slide1 />
+    <Slide1 />
+    <Slide1 />
+    <Slide1 />
 
 </section>
+
+<script>
+    const buttonTabs = Array.from(document.querySelectorAll("button.btn-tab"));
+    const slides = Array.from(document.querySelectorAll("section.slide"));
+
+    function switchActiveTab(button){
+        buttonTabs.forEach((btn, idx) => {
+            if(btn == button){
+                btn.classList.add("active");
+                slides[idx].classList.remove("disabled");
+            }
+            else{
+                btn.classList.remove("active");
+                slides[idx].classList.add("disabled");
+            }
+        })
+
+    }
+
+    switchActiveTab(buttonTabs[0])
+
+    buttonTabs.forEach(btn => {
+        btn.addEventListener("click", (evt) => {
+            switchActiveTab(evt.target);
+        });
+    });
+
+</script>
+
