@@ -3,148 +3,190 @@ const { width, height } = Astro.props;
 ---
 
 <div class="chart-container">
+  <div>
+    <div id="slider-div">
+      <label>Dia: <span id="day-label">1</span></label>
+      <div id="day-slider"></div>
+    </div>
+    <button id="play-button">Play</button>
+    <button id="reset-button">Reset</button>
+  </div>
   <div id="items-per-ws" class="chart-area"></div>
 </div>
 
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+></script>
+
 <script define:vars={{ width, height }}>
+  let interval,
+    playing = false;
+
+  const colorScale = d3.scaleOrdinal([
+    Colors.RED,
+    Colors.ORANGE,
+    Colors.BLUE,
+    Colors.GREEN,
+    Colors.YELLOW,
+    Colors.GREY,
+    Colors.BLACK,
+  ]);
+
   const SVG = d3
     .select("#items-per-ws")
     .append("svg")
     .attr("viewBox", `0,0, ${width}, ${height}`);
   const group = SVG.append("g");
   const margin = { left: 50, right: 10, top: 50, bottom: 20 };
-
   const HEIGHT = height - margin.top - margin.bottom;
   const WIDTH = width - margin.left - margin.right;
-
-  let x = d3.scaleLinear().range([WIDTH, 0]);
-  let y = d3.scaleBand().range([HEIGHT, 0]).paddingOuter(0.1).paddingInner(0.1);
-
-  let xAxisGroup = group
+  const x = d3.scaleLinear().range([WIDTH, 0]);
+  const y = d3
+    .scaleBand()
+    .range([HEIGHT, 0])
+    .paddingOuter(0.1)
+    .paddingInner(0.1);
+  const xAxisGroup = group
     .append("g")
     .attr("class", "x axis")
     .attr("transform", `translate(${margin.left}, ${margin.top + HEIGHT})`);
-
-  let yAxisGroup = group
+  const yAxisGroup = group
     .append("g")
     .attr("class", "x axis")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-  let idx = 0;
-
   const titleLabel = group
     .append("text")
-    .attr("class", "label")
-    .attr("x", margin.left + WIDTH / 2 - 50)
+    .attr("x", margin.left + WIDTH / 2)
     .attr("y", margin.top / 2)
     .attr("font-size", "20px")
     .attr("text-anchor", "middle")
-    .style("fill", d3.color("#000"))
-    .text("Top Workstations per Day");
-
+    .text("Top 10 Workstations per Day");
   const dayLabel = group
     .append("text")
-    .attr("class", "label")
     .attr("x", WIDTH)
     .attr("y", HEIGHT - 40)
     .attr("font-size", "20px")
     .attr("text-anchor", "middle")
-    .style("fill", d3.color("#ccc"))
     .text("Workstation");
-
-  const numDayLabel = group
+  const dayKeyLabel = group
     .append("text")
-    .attr("class", "label")
-    .attr("x", margin.left + WIDTH / 2 + 110)
-    .attr("y", margin.top / 2)
-    .attr("font-size", "20px")
+    .attr("x", margin.left + WIDTH / 2)
+    .attr("y", margin.top / 2 + 25)
+    .attr("font-size", "16px")
     .attr("text-anchor", "middle")
-    .style("fill", d3.color("#ccc"))
-    .text("");
+    .text("day1");
+  let idx = 0;
+  let dayKeys = [];
 
-  (async () => {
-    const raw = await d3.csv("/data/results.csv");
-    const formatted = raw.map((row) => {
-      const { Day } = row;
-      const Workstation = row["Work Station"].slice(0, 5);
-      const TotalItems = +row["Total items"];
-      return { Day, Workstation, TotalItems };
-    });
-
-    const daysItems = {};
-
-    formatted.forEach((row) => {
-      const key = `Day${row.Day}`;
-      if (daysItems[key] === undefined) {
-        daysItems[key] = {};
-      }
-      if (daysItems[key][row.Workstation] === undefined) {
-        daysItems[key][row.Workstation] = 0;
-      }
-      daysItems[key][row.Workstation] += row.TotalItems;
-    });
-
-    const dayKeys = Object.keys(daysItems);
-
-    d3.interval(() => {
-      const dayKey = dayKeys[idx];
-      const data = Object.entries(daysItems[dayKey]).map(([ws, totalItems]) => {
-        return { ws, totalItems };
-      });
-      const sorted = data.sort((a, b) => {
-        return a.totalItems - b.totalItems;
-      });
-      updateData(sorted.slice(0, 10));
-      numDayLabel.text(dayKey);
-      idx = (idx + 1) % dayKeys.length;
-    }, 500);
-  })();
-
-  function updateData(data) {
+  function update(data, currentDay) {
     let maxItems = 0;
-    const names = data.map((d) => d.ws);
-
-    data.forEach((dt) => {
-      if (dt.totalItems > maxItems) maxItems = dt.totalItems;
+    data.forEach((d) => {
+      if (d.totalItems > maxItems) maxItems = d.totalItems;
     });
-
     x.domain([maxItems, 0]);
-    y.domain(names);
-
-    const tran = d3.transition().duration(500);
+    y.domain(data.map((d) => d.ws));
+    const t = d3.transition().duration(500);
     const rects = group.selectAll("rect").data(data);
-
-    rects.exit().transition(tran).remove();
-
+    rects.exit().transition(t).remove();
     rects
-      .transition(tran)
-      .attr("y", (d) => {
-        return y(d.ws) + margin.top;
-      })
+      .transition(t)
+      .attr("y", (d) => y(d.ws) + margin.top)
       .attr("x", margin.left + 2)
       .attr("height", y.bandwidth())
-      .attr("width", (d) => {
-        return x(d.totalItems);
-      });
+      .attr("width", (d) => x(d.totalItems))
+      .attr("fill", (d) => colorScale(d.ws));
 
     rects
       .enter()
       .append("rect")
-      .transition(tran)
-      .attr("y", (d) => {
-        return y(d.ws) + margin.top;
-      })
+      .transition(t)
+      .attr("y", (d) => y(d.ws) + margin.top)
       .attr("x", margin.left + 2)
-      .attr("width", (d) => {
-        return x(d.totalItems);
-      })
+      .attr("width", (d) => x(d.totalItems))
       .attr("height", y.bandwidth())
-      .attr("fill", d3.color("#0099FF"));
+      .attr("fill", (d) => colorScale(d.ws));
 
-    const xAxisCall = d3.axisBottom(x).ticks(4);
-    const yAxisCall = d3.axisLeft(y).tickValues(names);
-
-    xAxisGroup.transition(tran).call(xAxisCall);
-    yAxisGroup.transition(tran).call(yAxisCall);
+    xAxisGroup.transition(t).call(d3.axisBottom(x).ticks(4));
+    yAxisGroup.transition(t).call(d3.axisLeft(y));
+    dayKeyLabel.text(currentDay);
   }
+
+  function step(daysItems) {
+    idx = (idx + 1) % dayKeys.length;
+    const dayKey = dayKeys[idx];
+    const rawData = Object.entries(daysItems[dayKey]).map(([ws, t]) => ({
+      ws,
+      totalItems: t,
+    }));
+    const sorted = rawData.sort((a, b) => a.totalItems - b.totalItems);
+    update(sorted.slice(0, 10), dayKey);
+  }
+
+  (async () => {
+    const raw = await d3.csv("/data/results.csv");
+    const daysItems = {};
+    raw.forEach((r) => {
+      const k = "Day" + r.Day;
+      if (!daysItems[k]) daysItems[k] = {};
+      if (!daysItems[k][r["Work Station"]]) daysItems[k][r["Work Station"]] = 0;
+      daysItems[k][r["Work Station"]] += +r["Total items"];
+    });
+    dayKeys = Object.keys(daysItems);
+    const firstKey = dayKeys[idx];
+    const initial = Object.entries(daysItems[firstKey]).map(([ws, t]) => ({
+      ws,
+      totalItems: t,
+    }));
+    const sorted = initial.sort((a, b) => a.totalItems - b.totalItems);
+    update(sorted.slice(0, 10), firstKey);
+
+    $("#play-button").on("click", function () {
+      if (!playing) {
+        $(this).text("Pause");
+        interval = setInterval(() => step(daysItems), 500);
+        playing = true;
+      } else {
+        $(this).text("Play");
+        clearInterval(interval);
+        playing = false;
+      }
+    });
+
+    $("#reset-button").on("click", function () {
+      idx = 0;
+      playing = false;
+      $("#play-button").text("Play");
+      clearInterval(interval);
+      const dayKey = dayKeys[idx];
+      const rawData = Object.entries(daysItems[dayKey]).map(([ws, t]) => ({
+        ws,
+        totalItems: t,
+      }));
+      const sorted = rawData.sort((a, b) => a.totalItems - b.totalItems);
+      update(sorted.slice(0, 10), dayKey);
+      $("#day-slider").slider("value", 0);
+      $("#day-label").text(1);
+    });
+
+    $("#day-slider").slider({
+      min: 0,
+      max: dayKeys.length - 1,
+      step: 1,
+      slide: (event, ui) => {
+        idx = ui.value;
+        const dk = dayKeys[idx];
+        const rawData = Object.entries(daysItems[dk]).map(([ws, t]) => ({
+          ws,
+          totalItems: t,
+        }));
+        const sorted = rawData.sort((a, b) => a.totalItems - b.totalItems);
+        update(sorted.slice(0, 10), dk);
+        $("#day-label").text(idx + 1);
+      },
+    });
+  })();
 </script>
