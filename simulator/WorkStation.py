@@ -10,8 +10,7 @@ class WorkStation(object):
     manages the failures probabilities, request for suppliers and fixing actions in
     case it fails a quality test after 5 items manufactured
     """
-    def __init__(self, ws_id: str, failure_prob: float, app, suppliers: simpy.Resource,
-                 env: simpy.Environment) -> None:
+    def __init__(self, ws_id: str, failure_prob: float, app, suppliers: simpy.Resource, env: simpy.Environment) -> None:
         self._env = env
         self._bin = Bin()
         self._id = ws_id
@@ -89,8 +88,10 @@ class WorkStation(object):
                 failure_chance = max(0, min(1, failure_chance))
                 if random.random() < failure_chance:
                     #print(f"{self._id} test [{ColorsCLI.ERROR}FAILED{ColorsCLI.DEFAULT}]")
+                    self._failures += 1
                     yield self._env.process(self.fix_work_station())
                 else:
+                    self._successes += 1
                     pass
                     #print(f"{self._id} test [{ColorsCLI.SUCCESS}SUCCESS{ColorsCLI.DEFAULT}]")
                 self._items_to_verification = 5
