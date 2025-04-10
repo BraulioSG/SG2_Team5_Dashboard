@@ -63,7 +63,6 @@ const { width, height } = Astro.props;
 
     //Define filter variables
     const filterSelect = document.querySelector("select#work-station-select");
-    console.log(filterSelect);
 
     //Updates the graph
     function update(data){
@@ -73,7 +72,6 @@ const { width, height } = Astro.props;
         var levelFilter = filterSelect.value;
         if(levelFilter != "Company level"){
             data = data.filter(d => {
-                console.log(`${d["Work Station"].trim().toLowerCase()} vs ${levelFilter.trim().toLowerCase()} = ${d["Work Station"].trim().toLowerCase() === levelFilter.trim().toLowerCase()}`);
                 return d["Work Station"].trim().toLowerCase() === levelFilter.trim().toLowerCase();
             })
         }
@@ -172,21 +170,20 @@ const { width, height } = Astro.props;
             ["Day"]: +d["Day"],
         }));
 
-        //Changes DAY when slider is changed
-        /*
-        slider.oninput = function(){
-            day = this.value;
-            dayLabel.innerHTML = `Day: ${day}`;
-            update(data);
-        }*/
-
         filterSelect.onchange = function(){
             update(data);
         }
 
+        const slider = document.querySelector("input[type=range]#timescatteritems-range");
+        slider.addEventListener("input", () => {
+            day = slider.value;
+            update(data);
+        })
+
         d3.interval( () => {
-            if(sessionStorage.getItem("timescatter-pause") === "false") return;
+            if(sessionStorage.getItem("timescatteritems-pause") === "false") return;
             if(day <= 100){
+                slider.value = day;
                 update(data);
                 day++;
             }
@@ -209,7 +206,4 @@ const { width, height } = Astro.props;
         .attr("transform", "rotate(-90)")
         .attr("font-size", "20px")
         .text(yKey);
-
-
-
 </script>

@@ -10,18 +10,8 @@ import PieGraph from "../../graphs/PieGraph.astro";
 <Slide>
     <main id="PieGraph" class="slide-content"> 
         <div class="toolbar">
-            <button class="play-btn" id="timescatter-play-btn">Pause</button>
-            <label for="top"><strong>Top: </strong></label>
-            <select id="work-select" name="top">
-                <option>Company level</option>
-                <option>WS#1@PL#1</option>
-                <option>WS#2@PL#1</option>
-                <option>WS#3@PL#1</option>
-                <option>WS#4@PL#1</option>
-                <option>WS#5@PL#1</option>
-                <option>WS#6@PL#1</option>
-            </select>
-        </div>
+            <button class="play-btn" id="piechart-play-btn">Pause</button>
+       </div>
         <div class="info">
             <h1>Approval Rate</h1>
             <p>A brief description of this section</p>
@@ -36,11 +26,12 @@ import PieGraph from "../../graphs/PieGraph.astro";
     </main>
 </Slide>
 <script>
-    sessionStorage.setItem("timescatter-pause", "true");
+    sessionStorage.setItem("piechart-pause", "true");
 
-    document.querySelector("button#timescatter-play-btn").addEventListener("click", () => {
-        const isPlaying = sessionStorage.getItem("timescatter-pause") === "true";
-        sessionStorage.setItem("timescatter-pause", isPlaying ? "false" : "true");
-        document.querySelector("button#timescatter-play-btn").innerText = isPlaying ? "Play" : "Pause";
+    document.querySelector("button#piechart-play-btn").addEventListener("click", () => {
+        const isPlaying = sessionStorage.getItem("piechart-pause") === "true";
+        sessionStorage.setItem("piechart-pause", isPlaying ? "false" : "true");
+        document.querySelector("button#piechart-play-btn").innerText = isPlaying ? "Play" : "Pause";
+        console.log("hello")
     })
 </script>

@@ -36,13 +36,13 @@ const { width, height } = Astro.props;
         },
       };
     });
-    console.log("PIE GRAPH DATA:", parsedData);
     let dayGroups = d3.group(parsedData, (d) => d.day);
     let days = Array.from(dayGroups.keys()).sort((a, b) => a - b);
     let dayIndex = 0,
     stationIndex = 0;
 
     function cycleData() {
+        if(sessionStorage.getItem("piechart-pause") === "false") return;
       if (dayIndex >= days.length) return;
       let currentDay = days[dayIndex];
       let stations = dayGroups.get(currentDay);

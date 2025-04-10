@@ -10,7 +10,8 @@ import DowntimeItemsScatter from "../../graphs/DowntimeItemsScatter.astro";
 <Slide>
     <main id="DowntimeItems" class="slide-content"> 
         <div class="toolbar">
-            <button class="play-btn" id="timescatter-play-btn">Pause</button>
+            <input type="range" id="timescatteritems-range" min=0 max=100 step=1/>
+            <button class="play-btn" id="timescatteritems-play-btn">Pause</button>
             <label for="top"><strong>Top: </strong></label>
             <select id="work-station-select" name="top">
                 <option>Company level</option>
@@ -36,11 +37,11 @@ import DowntimeItemsScatter from "../../graphs/DowntimeItemsScatter.astro";
     </main>
 </Slide>
 <script>
-    sessionStorage.setItem("timescatter-pause", "true");
+    sessionStorage.setItem("timescatteritems-pause", "true");
 
-    document.querySelector("button#timescatter-play-btn").addEventListener("click", () => {
-        const isPlaying = sessionStorage.getItem("timescatter-pause") === "true";
-        sessionStorage.setItem("timescatter-pause", isPlaying ? "false" : "true");
-        document.querySelector("button#timescatter-play-btn").innerText = isPlaying ? "Play" : "Pause";
+    document.querySelector("button#timescatteritems-play-btn").addEventListener("click", () => {
+        const isPlaying = sessionStorage.getItem("timescatteritems-pause") === "true";
+        sessionStorage.setItem("timescatteritems-pause", isPlaying ? "false" : "true");
+        document.querySelector("button#timescatteritems-play-btn").innerText = isPlaying ? "Play" : "Pause";
     })
 </script>

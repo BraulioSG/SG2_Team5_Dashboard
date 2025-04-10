@@ -36,7 +36,6 @@ const { width, height } = Astro.props;
         .attr("height", HEIGHT)
 
     //Define Slider variables
-    let slider = document.getElementById("dayRange");
     let day = 1;
 
     //Define Day Label
@@ -64,7 +63,6 @@ const { width, height } = Astro.props;
 
     //Define filter variables
     const filterSelect = document.querySelector("select#work-select");
-    console.log(filterSelect);
 
     //Updates the graph
     function update(data){
@@ -178,11 +176,19 @@ const { width, height } = Astro.props;
             update(data);
         }
 
+        const slider = document.querySelector("input[type=range]#timescatter-range");
+        slider.addEventListener("input", () => {
+            day = slider.value;
+            update(data);
+        })
+
         d3.interval( () => {
             if(sessionStorage.getItem("timescatter-pause") === "false") return;
             if(day <= 100){
+                slider.value = day;
                 update(data);
                 day++;
+                
             }
         }, 500);
         update(data);
