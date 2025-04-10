@@ -1,3 +1,7 @@
+---
+import TimeScatterPlot from "../graphs/TimeScatterPlot.astro"
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
@@ -10,7 +14,7 @@
         <script is:inline src="/colors.js"></script>
 	</head>
 	<body>
-		<slot />
+		<TimeScatterPlot width={600} height={400} />
 	</body>
 </html>
 <style is:global>
