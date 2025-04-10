@@ -138,7 +138,7 @@ const { width, height } = Astro.props;
     dayKeys = Object.keys(daysItems);
     const firstKey = dayKeys[idx];
     const initial = Object.entries(daysItems[firstKey]).map(([ws, t]) => ({
-      ws,
+      ws: ws.slice(0, 5),
       totalItems: t,
     }));
     const sorted = initial.sort((a, b) => a.totalItems - b.totalItems);
