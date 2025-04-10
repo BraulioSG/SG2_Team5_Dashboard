@@ -4,13 +4,16 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="stylesheet" href="/aos.css" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Manufactory Simulator Dashboard</title>
         <script is:inline src="/d3.v7.min.js"></script>
+        <script is:inline src="/aos.js"></script>
         <script is:inline src="/colors.js"></script>
 	</head>
 	<body>
 		<slot/>
+        <script>AOS.init()</script>
 	</body>
 </html>
 <style is:global>

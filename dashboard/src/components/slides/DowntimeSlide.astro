@@ -1,0 +1,163 @@
+---
+import Slide from "../../layouts/Slide.astro";
+import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
+---
+<style is:global>
+    #DowntimeSlide{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px 80px;
+        position: relative;
+    }
+
+    #DowntimeSlide div{
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+    }
+    #DowntimeSlide .info{
+        width: 50%;
+        height: 100%;
+        align-items: center;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #DowntimeSlide .info .info-summary{
+        width: 100%;
+        max-height: 500;
+        overflow: hidden;
+    }
+
+    #DowntimeSlide .info .info-summary .entries{
+        height: 100%;
+        width: 100%;
+        overflow-y: auto;
+        display:flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    #DowntimeSlide .graphics{
+        width: 50%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    #DowntimeSlide .info h1{
+        width: 100%;
+        height: 10%;
+    }
+    #DowntimeSlide .info .info-entry{
+        width: 100%;
+        height: fit-content;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #f1f1f1;
+        margin-bottom: 10px;
+        animation-name: showup;
+        animation-duration: 1000ms;
+        animation-timing-function: ease;
+    }
+    #DowntimeSlide .info .info-entry .info-entry-day{
+        display: inline-block;
+        width: fit-content;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        width: 200px;
+    }
+    #DowntimeSlide .info .info-entry .info-entry-day p{
+        font-weight: bold;
+        font-size: 2rem;
+    }
+    #DowntimeSlide .info .info-entry .info-entry-day h3{
+        font-size: 8rem;
+    }
+    #DowntimeSlide .info .info-entry .info-entry-data{
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 100%;
+    }
+
+    @keyframes showup{
+        from{
+            transform: translateY(100%);
+        }
+        to{
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+<Slide>
+    <main id="DowntimeSlide" class="slide-content"> 
+        <div class="info">
+            <h1>Downtime over the days</h1>
+            <div class="info-summary">
+                <div class="entries" id="DowntimeSlide-info-entries">
+                </div>
+            </div>
+        </div>
+        <div class="graphics">
+            <DowntimeGraph  width={500} height={500}/>
+        </div>
+    </main>
+</Slide>
+<script>
+    const infoSummary = document.querySelector("div#DowntimeSlide-info-entries"); 
+    let idx = 0;
+    console.log(infoSummary.innerHTML);
+
+    function addInfoEntry(ws1, ws2, ws3, ws4, ws5, ws6){
+        const sum = (+ws1.Downtime) + (+ws2.Downtime) + (+ws3.Downtime)+ (+ws4.Downtime) + (+ws5.Downtime) + (+ws6.Downtime);
+        infoSummary.innerHTML += `
+            <div class="info-entry">
+                <div class="info-entry-day">
+                    <p>Day</p>
+                    <h3>${ws1.Day}</h3>
+                </div> 
+                <div class="info-entry-data">
+                    <p>WorkStation 1: <span>${Math.round(ws1.Downtime * 100) / 100}</span></p>
+                    <p>WorkStation 2: <span>${Math.round(ws2.Downtime * 100) / 100}</span></p>
+                    <p>WorkStation 3: <span>${Math.round(ws3.Downtime * 100) / 100}</span></p>
+                    <p>WorkStation 4: <span>${Math.round(ws4.Downtime * 100) / 100}</span></p>
+                    <p>WorkStation 5: <span>${Math.round(ws5.Downtime * 100) / 100}</span></p>
+                    <p>WorkStation 6: <span>${Math.round(ws6.Downtime * 100) / 100}</span></p>
+                    <hr>
+                    <p><strong>Total: </strong><span>${Math.round(sum * 100) / 100}</span></p>
+                </div>
+            </div>
+        `
+    }
+    (async ()=>{
+       const raw = await d3.csv("/data/results.csv")
+           const interval = setInterval(() => {
+           const ws1 = raw[idx + 0];
+           const ws2 = raw[idx + 1];
+           const ws3 = raw[idx + 2];
+           const ws4 = raw[idx + 3];
+           const ws5 = raw[idx + 4];
+           const ws6 = raw[idx + 5];
+           addInfoEntry(ws1, ws2, ws3, ws4, ws5, ws6);
+           idx += 6;
+           if(idx >= raw.length){
+               clearInterval(interval);
+           }
+       }, 1000)
+    })() 
+</script>

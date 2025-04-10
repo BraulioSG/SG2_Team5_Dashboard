@@ -1,5 +1,6 @@
 ---
 import Slide1 from "./slides/Slide1.astro";
+import DowntimeSlide from "./slides/DowntimeSlide.astro";
 ---
 
 <style>
@@ -36,7 +37,7 @@ import Slide1 from "./slides/Slide1.astro";
     }
 </style>
 
-<section id="slides-section">
+<section id="slides-section" data-aos="fade-up">
     <div class="tabs">
         <button class="btn-tab active">Slide 1</button>
         <button class="btn-tab">Slide 2</button>
@@ -46,7 +47,7 @@ import Slide1 from "./slides/Slide1.astro";
         <button class="btn-tab">Slide 6</button>
     </div>
 
-    <Slide1 />
+    <DowntimeSlide />
     <Slide1 />
     <Slide1 />
     <Slide1 />
