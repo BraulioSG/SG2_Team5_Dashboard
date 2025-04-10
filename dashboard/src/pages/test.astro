@@ -1,0 +1,21 @@
+---
+import Layout from "../layouts/Layout.astro";
+import DowntimeGraph from "../graphs/DowntimeGraph.astro";
+import PieGraph from "../graphs/PieGraph.astro";
+---
+
+<Layout>
+    <div class="test-container">
+        <DowntimeGraph width={500} height={500} />
+        <PieGraph width={500} height={500} />
+    </div>
+</Layout>
+
+<style>
+    .test-container{
+        width: 100vw;
+        height: 100vh;
+
+        display: flex;
+    }
+</style>

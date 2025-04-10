@@ -1,14 +1,6 @@
 ---
 const { width, height } = Astro.props;
 ---
-
-<style define:vars={{ width, height }}>
-  #pie-graph {
-    width: var(--width);
-    height: var(--height);
-  }
-</style>
-
 <div class="chart-container">
   <div id="pie-graph" class="chart-area"></div>
 </div>
@@ -17,21 +9,15 @@ const { width, height } = Astro.props;
   const margin = { left: 50, right: 10, top: 50, bottom: 20 };
   const HEIGHT = height - margin.top - margin.bottom;
   const WIDTH = width - margin.left - margin.right;
-  const radius = Math.min(WIDTH, HEIGHT) / 2;
-  const SVG = d3
-    .select("#pie-graph")
-    .append("svg")
-    .attr("viewBox", `0 0 ${width} ${height}`);
-  const g = SVG.append("g");
+  const radius = Math.min(WIDTH, HEIGHT) / 2.5;
+  
+  const SVG = d3.select("#pie-graph").append("svg").attr("viewBox", `0, 0, ${width}, ${height}`);
 
-  var arc = d3
-    .arc()
-    .outerRadius(radius - 20)
-    .innerRadius(0);
-  var pie = d3
-    .pie()
-    .value((d) => d.value)
-    .sort(null);
+  const g = SVG.append("g").attr("transform", `translate(${radius}, ${height / 2})`);
+
+  var arc = d3.arc().outerRadius(radius - 20).innerRadius(0);
+  var pie = d3.pie().value((d) => d.value).sort(null);
+
   (async () => {
     const data = await d3.csv("/data/results.csv");
     const parsedData = data.map((row) => {
@@ -54,7 +40,8 @@ const { width, height } = Astro.props;
     let dayGroups = d3.group(parsedData, (d) => d.day);
     let days = Array.from(dayGroups.keys()).sort((a, b) => a - b);
     let dayIndex = 0,
-      stationIndex = 0;
+    stationIndex = 0;
+
     function cycleData() {
       if (dayIndex >= days.length) return;
       let currentDay = days[dayIndex];
@@ -84,7 +71,7 @@ const { width, height } = Astro.props;
       // Añadir grupo de información a la derecha del gráfico
       const infoPanel = SVG.append("g")
         .attr("class", "info-panel")
-        .attr("transform", `translate(${width - 20}, ${margin.top + 20})`)
+        .attr("transform", `translate(${width - 150}, ${margin.top + 20})`)
         .style("font-family", "sans-serif");
 
       infoPanel
