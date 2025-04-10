@@ -1,0 +1,184 @@
+---
+const { width, height } = Astro.props;
+---
+
+<style define:vars={{ width, height }}>
+  #pie-graph {
+    width: var(--width);
+    height: var(--height);
+  }
+</style>
+
+<div class="chart-container">
+  <div id="pie-graph" class="chart-area"></div>
+</div>
+
+<script define:vars={{ width, height }}>
+  const margin = { left: 50, right: 10, top: 50, bottom: 20 };
+  const HEIGHT = height - margin.top - margin.bottom;
+  const WIDTH = width - margin.left - margin.right;
+  const radius = Math.min(WIDTH, HEIGHT) / 2;
+  const SVG = d3
+    .select("#pie-graph")
+    .append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`);
+  const g = SVG.append("g");
+
+  var arc = d3
+    .arc()
+    .outerRadius(radius - 20)
+    .innerRadius(0);
+  var pie = d3
+    .pie()
+    .value((d) => d.value)
+    .sort(null);
+  (async () => {
+    const data = await d3.csv("/data/results.csv");
+    const parsedData = data.map((row) => {
+      const Day = row["Day"];
+      const Workstation = row["Work Station"];
+      const ApprovedItems = +row["Approved items"];
+      const RejectedItems = +row["Rejected items"];
+      const TotalItems = +row["Total items"];
+      return {
+        day: Day,
+        workstation: Workstation,
+        fabric: {
+          totalItems: TotalItems,
+          aprovedItems: ApprovedItems,
+          rejectedItems: RejectedItems,
+        },
+      };
+    });
+    console.log("PIE GRAPH DATA:", parsedData);
+    let dayGroups = d3.group(parsedData, (d) => d.day);
+    let days = Array.from(dayGroups.keys()).sort((a, b) => a - b);
+    let dayIndex = 0,
+      stationIndex = 0;
+    function cycleData() {
+      if (dayIndex >= days.length) return;
+      let currentDay = days[dayIndex];
+      let stations = dayGroups.get(currentDay);
+      if (stationIndex >= stations.length) {
+        dayIndex++;
+        stationIndex = 0;
+        if (dayIndex >= days.length) return;
+        currentDay = days[dayIndex];
+        stations = dayGroups.get(currentDay);
+      }
+      let station = stations[stationIndex];
+      stationIndex++;
+
+      const { totalItems, aprovedItems, rejectedItems } = station.fabric;
+
+      update({
+        values: [
+          { region: "Aprobados", value: aprovedItems },
+          { region: "Rechazados", value: rejectedItems },
+        ],
+      });
+
+      // Limpiar panel de info si ya existe
+      SVG.select(".info-panel").remove();
+
+      // Añadir grupo de información a la derecha del gráfico
+      const infoPanel = SVG.append("g")
+        .attr("class", "info-panel")
+        .attr("transform", `translate(${width - 20}, ${margin.top + 20})`)
+        .style("font-family", "sans-serif");
+
+      infoPanel
+        .append("text")
+        .attr("y", 0)
+        .text(`Día: ${currentDay}`)
+        .style("font-size", "24px");
+
+      infoPanel
+        .append("text")
+        .attr("y", 20)
+        .text(`Estación: ${station.workstation}`)
+        .style("font-size", "14px");
+
+      infoPanel
+        .append("text")
+        .attr("y", 40)
+        .text(`Aprobados: ${aprovedItems}`)
+        .style("font-size", "14px")
+        .style("fill", "green");
+
+      infoPanel
+        .append("text")
+        .attr("y", 60)
+        .text(`Rechazados: ${rejectedItems}`)
+        .style("font-size", "14px")
+        .style("fill", "#e63946");
+    }
+    cycleData();
+    setInterval(cycleData, 1000);
+  })();
+  function update(region) {
+    var path = g.selectAll("path");
+    var data0 = path.data(),
+      data1 = pie(region.values);
+    path = path.data(data1, key);
+    path
+      .exit()
+      .datum((d, i) => {
+        return findNeighborArc(i, data1, data0, key) || d;
+      })
+      .transition()
+      .duration(750)
+      .attrTween("d", arcTween)
+      .remove();
+    path.transition().duration(750).attrTween("d", arcTween);
+    path
+      .enter()
+      .append("path")
+      .each(function (d, i) {
+        this._current = findNeighborArc(i, data0, data1, key) || d;
+      })
+      .attr("fill", (d) =>
+        d.data.region === "Rechazados" ? "#e63946" : "green"
+      )
+      .transition()
+      .duration(750)
+      .attrTween("d", arcTween);
+  }
+  function key(d) {
+    return d.data.region;
+  }
+  function findNeighborArc(i, data0, data1, key) {
+    var d;
+    return (d = findPreceding(i, data0, data1, key))
+      ? { startAngle: d.endAngle, endAngle: d.endAngle }
+      : (d = findFollowing(i, data0, data1, key))
+        ? { startAngle: d.startAngle, endAngle: d.startAngle }
+        : null;
+  }
+  function findPreceding(i, data0, data1, key) {
+    var m = data0.length;
+    while (--i >= 0) {
+      var k = key(data1[i]);
+      for (var j = 0; j < m; ++j) {
+        if (key(data0[j]) === k) return data0[j];
+      }
+    }
+  }
+  function findFollowing(i, data0, data1, key) {
+    var n = data1.length,
+      m = data0.length;
+    while (++i < n) {
+      var k = key(data1[i]);
+      for (var j = 0; j < m; ++j) {
+        if (key(data0[j]) === k) return data0[j];
+      }
+    }
+  }
+  function arcTween(d) {
+    var i = d3.interpolate(this._current, d);
+    this._current = i(1);
+    return function (t) {
+      return arc(i(t));
+    };
+  }
+</script>
