@@ -37,6 +37,12 @@ class WorkStation(object):
     def is_busy(self) -> bool:
         return self._busy
 
+    def get_approved(self):
+        return self._successes
+
+    def get_rejected(self):
+        return self._failures
+
     def get_avg_fixing_time(self) -> float:
         if len(self._fixing_times) == 0:
             return 0.0
