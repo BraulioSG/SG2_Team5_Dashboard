@@ -55,8 +55,15 @@ const { width, height } = Astro.props;
 
     //Define Slider variables
     let slider = document.getElementById("dayRange");
-    let dayLabel = document.getElementById("dayLabel");
     let day = 1;
+
+    //Define Day Label
+    let dayText = group.append("text")
+        .attr("x", WIDTH - 50)
+        .attr("y", HEIGHT - 30)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .text(`Day: ${day}`)
 
     //Define color palette
     const customColors = ["#8CB369", "#F4E285", "#F4A259", "#5B8E7D", "#BC4B51", "#8a95cc"];
@@ -132,10 +139,13 @@ const { width, height } = Astro.props;
 
         leftAxisGroup.transition(t).call(leftAxis);
 
+        //Update day label
+        dayText.text(`Day: ${day}`);
+
     }
 
     // Create the legend
-    let legendContainer = SVG.selectAll("g#legend-container").data([null]);
+    let legendContainer = SVG.selectAll("g").data([null]);
 
     legendContainer = legendContainer.enter()
         .append("g")
@@ -162,6 +172,8 @@ const { width, height } = Astro.props;
         .text(d => d)
         .attr("font-size", "9px");
 
+
+
     //Loads and processes data
     (async ()=>{
         //Loads data and sets up the values that are going to be used as numbers
@@ -186,8 +198,11 @@ const { width, height } = Astro.props;
         }
 
         d3.interval( () => {
-            day = (day + 1) % 101;
-            update(data)
+            if(sessionStorage.getItem("timescatter-pause") === "false") return;
+            if(day <= 100){
+                update(data);
+                day++;
+            }
         }, 500);
         update(data);
     })()

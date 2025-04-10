@@ -18,7 +18,7 @@ const { width, height } = Astro.props;
     //Define plot variables
     var x = d3.scaleLinear().range([0, WIDTH]);
     var y = d3.scaleLinear().range([HEIGHT, 0]);
-    var area = d3.scaleLinear().range([15 * Math.PI, 150 * Math.PI]);
+    var area = d3.scaleLinear().range([15 * Math.PI, 250 * Math.PI]);
 
     var xKey = "Avg. Supplying time";
     var yKey = "Avg. Fixing time";
@@ -37,8 +37,15 @@ const { width, height } = Astro.props;
 
     //Define Slider variables
     let slider = document.getElementById("dayRange");
-    let dayLabel = document.getElementById("dayLabel");
     let day = 1;
+
+    //Define Day Label
+    let dayText = group.append("text")
+        .attr("x", WIDTH - 50)
+        .attr("y", HEIGHT - 30)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .text(`Day: ${day}`);
 
     //Define color palette
     const customColors = ["#8CB369", "#F4E285", "#F4A259", "#5B8E7D", "#BC4B51", "#8a95cc"];
@@ -115,6 +122,9 @@ const { width, height } = Astro.props;
 
         leftAxisGroup.transition(t).call(leftAxis);
 
+        //Update day label
+        dayText.text(`Day: ${day}`);
+
     }
 
     // Create the legend
@@ -170,8 +180,10 @@ const { width, height } = Astro.props;
 
         d3.interval( () => {
             if(sessionStorage.getItem("timescatter-pause") === "false") return;
-            day = (day + 1) % 101;
-            update(data)
+            if(day <= 100){
+                update(data);
+                day++;
+            }
         }, 500);
         update(data);
     })()
@@ -191,4 +203,6 @@ const { width, height } = Astro.props;
         .attr("transform", "rotate(-90)")
         .attr("font-size", "20px")
         .text(yKey);
+
+
 </script>
