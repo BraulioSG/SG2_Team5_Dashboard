@@ -35,12 +35,12 @@ const { width, height } = Astro.props;
   const titleLabel = group
     .append("text")
     .attr("class", "label")
-    .attr("x", margin.left + WIDTH / 2)
+    .attr("x", margin.left + WIDTH / 2 - 50)
     .attr("y", margin.top / 2)
     .attr("font-size", "20px")
     .attr("text-anchor", "middle")
     .style("fill", d3.color("#000"))
-    .text("Top 10 Days With Items Per Workstation");
+    .text("Top Workstations per Day");
 
   const dayLabel = group
     .append("text")
@@ -50,55 +50,59 @@ const { width, height } = Astro.props;
     .attr("font-size", "20px")
     .attr("text-anchor", "middle")
     .style("fill", d3.color("#ccc"))
-    .text("Day");
+    .text("Workstation");
 
   const numDayLabel = group
     .append("text")
     .attr("class", "label")
-    .attr("x", WIDTH)
-    .attr("y", HEIGHT)
-    .attr("font-size", "40px")
+    .attr("x", margin.left + WIDTH / 2 + 110)
+    .attr("y", margin.top / 2)
+    .attr("font-size", "20px")
     .attr("text-anchor", "middle")
     .style("fill", d3.color("#ccc"))
-    .text("0");
+    .text("");
 
   (async () => {
     const raw = await d3.csv("/data/results.csv");
-
     const formatted = raw.map((row) => {
       const { Day } = row;
-      const Workstation = row["Work Station"];
+      const Workstation = row["Work Station"].slice(0, 5);
       const TotalItems = +row["Total items"];
-
       return { Day, Workstation, TotalItems };
     });
 
     const daysItems = {};
 
     formatted.forEach((row) => {
-      const key = `day${row.Day}`;
+      const key = `Day${row.Day}`;
       if (daysItems[key] === undefined) {
-        daysItems[key] = { totalItems: row.TotalItems, day: key };
-      } else {
-        daysItems[key]["totalItems"] += row.TotalItems;
+        daysItems[key] = {};
       }
+      if (daysItems[key][row.Workstation] === undefined) {
+        daysItems[key][row.Workstation] = 0;
+      }
+      daysItems[key][row.Workstation] += row.TotalItems;
     });
 
+    const dayKeys = Object.keys(daysItems);
+
     d3.interval(() => {
-      const data = Object.values(daysItems);
-      const sliced = data.slice(0, idx + 1);
-      const sorted = sliced.sort((a, b) => {
+      const dayKey = dayKeys[idx];
+      const data = Object.entries(daysItems[dayKey]).map(([ws, totalItems]) => {
+        return { ws, totalItems };
+      });
+      const sorted = data.sort((a, b) => {
         return a.totalItems - b.totalItems;
       });
-      updateData(sorted.slice(0, Math.min(idx, 10)));
-      numDayLabel.text(idx + 1);
-      idx = (idx + 1) % data.length;
+      updateData(sorted.slice(0, 10));
+      numDayLabel.text(dayKey);
+      idx = (idx + 1) % dayKeys.length;
     }, 500);
   })();
 
   function updateData(data) {
     let maxItems = 0;
-    const names = data.map((d) => d.day);
+    const names = data.map((d) => d.ws);
 
     data.forEach((dt) => {
       if (dt.totalItems > maxItems) maxItems = dt.totalItems;
@@ -115,7 +119,7 @@ const { width, height } = Astro.props;
     rects
       .transition(tran)
       .attr("y", (d) => {
-        return y(d.day) + margin.top;
+        return y(d.ws) + margin.top;
       })
       .attr("x", margin.left + 2)
       .attr("height", y.bandwidth())
@@ -128,7 +132,7 @@ const { width, height } = Astro.props;
       .append("rect")
       .transition(tran)
       .attr("y", (d) => {
-        return y(d.day) + margin.top;
+        return y(d.ws) + margin.top;
       })
       .attr("x", margin.left + 2)
       .attr("width", (d) => {
