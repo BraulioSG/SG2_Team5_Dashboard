@@ -9,8 +9,17 @@ const { width, height } = Astro.props;
 </style>
 
 <div id="downtime-graph">
-    <h2 id = "dayLabel">Day: 1</h2>
-    <input type="range" min="1" max="100" value="1" class="slider" id="dayRange">
+    <!---h2 id = "dayLabel">Day: 1</h2>
+    <input type="range" min="1" max="100" value="1" class="slider" id="dayRange"-->
+    <select id="work-station-select">
+        <option>Company level</option>
+        <option>WS#1@PL#1</option>
+        <option>WS#2@PL#1</option>
+        <option>WS#3@PL#1</option>
+        <option>WS#4@PL#1</option>
+        <option>WS#5@PL#1</option>
+        <option>WS#6@PL#1</option>
+    </select>
     <div id="time-graph"></div>
 </div>
 
@@ -49,25 +58,44 @@ const { width, height } = Astro.props;
     let dayLabel = document.getElementById("dayLabel");
     let day = 1;
 
+    //Define color palette
+    const customColors = ["#8CB369", "#F4E285", "#F4A259", "#5B8E7D", "#BC4B51", "#8a95cc"];
+    const allStations = [
+        "WS#1@PL#1",
+        "WS#2@PL#1",
+        "WS#3@PL#1",
+        "WS#4@PL#1",
+        "WS#5@PL#1",
+        "WS#6@PL#1"
+    ];
+
+    const color = d3.scaleOrdinal()
+        .domain(allStations)
+        .range(customColors);
+
+    //Define filter variables
+    let filterSelect = document.getElementById("work-station-select");
+
     //Updates the graph
     function update(data){
         const t = d3.transition().duration(150);
 
         //Filter data
-
+        var levelFilter = filterSelect.value;
+        if(levelFilter != "Company level"){
+            data = data.filter(d => {
+                console.log(`${d["Work Station"].trim().toLowerCase()} vs ${levelFilter.trim().toLowerCase()} = ${d["Work Station"].trim().toLowerCase() === levelFilter.trim().toLowerCase()}`);
+                return d["Work Station"].trim().toLowerCase() === levelFilter.trim().toLowerCase();
+            })
+        }
         data = data.filter(d => {
-           return d["Day"] <= day;
+            return d["Day"] <= day;
         });
         data = data.filter(d => d[xKey] > 0 && !isNaN(d[xKey]) && !isNaN(d[yKey]));
 
         x.domain([0, 1000]);
         y.domain([0, 5000]);
         area.domain(d3.extent(data, d =>  d[areaKey]));
-
-        const customColors = ["#8CB369", "#F4E285", "#F4A259", "#5B8E7D", "#BC4B51", "#8a95cc"];
-        var color = d3.scaleOrdinal()
-            .domain(data.map(d => d["Work Station"]))
-            .range(customColors);
 
         //Updates circles
         var circles = group.selectAll("circle").data(data);
@@ -104,49 +132,63 @@ const { width, height } = Astro.props;
 
         leftAxisGroup.transition(t).call(leftAxis);
 
-        // Create the legend
-        const legendWidth = 100; // Width of the legend box
-        const legendHeight = 10; // Height of the individual legend items
-        const legendSpacing = 1; // Spacing between legend items
-        const legendX = WIDTH + 30; // Position of the legend on the X-axis (outside the chart)
-        const legendY = 30; // Starting position on the Y-axis
-
-        const legendGroup = SVG.selectAll(".legend")
-            .data(color.domain()) // Data bound to the color categories
-            .enter().append("g")
-            .attr("class", "legend")
-            .attr("transform", (d, i) => `translate(${legendX}, ${legendY + i * (legendHeight + legendSpacing)})`);
-
-        legendGroup.append("rect")
-            .attr("width", legendHeight)
-            .attr("height", legendHeight)
-            .attr("fill", d => color(d));
-
-        legendGroup.append("text")
-            .attr("x", legendHeight + legendSpacing)
-            .attr("y", legendHeight / 2)
-            .attr("dy", "0.35em") // Center the text vertically
-            .text(d => d)
-            .attr("font-size", "9px");
     }
+
+    // Create the legend
+    let legendContainer = SVG.selectAll("g#legend-container").data([null]);
+
+    legendContainer = legendContainer.enter()
+        .append("g")
+        .attr("id", "legend-container")
+        .merge(legendContainer);
+
+    legendContainer.selectAll("*").remove();
+
+    const legendGroup = legendContainer.selectAll(".legend")
+        .data(color.domain())
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", (d, i) => `translate(${WIDTH + 30}, ${30 + i * 12})`);
+
+    legendGroup.append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("fill", d => color(d));
+
+    legendGroup.append("text")
+        .attr("x", 14)
+        .attr("y", 5)
+        .attr("dy", "0.35em")
+        .text(d => d)
+        .attr("font-size", "9px");
 
     //Loads and processes data
     (async ()=>{
         //Loads data and sets up the values that are going to be used as numbers
         const data = await d3.csv("/data/results.csv", d => ({
             ...d,
-                [xKey]: +d[xKey],
-                [yKey]: +d[yKey],
-                [areaKey]: +d[areaKey],
-                ["Day"]: +d["Day"],
+            [xKey]: +d[xKey],
+            [yKey]: +d[yKey],
+            [areaKey]: +d[areaKey],
+            ["Day"]: +d["Day"],
         }));
 
         //Changes DAY when slider is changed
+        /*
         slider.oninput = function(){
             day = this.value;
             dayLabel.innerHTML = `Day: ${day}`;
             update(data);
+        }*/
+
+        filterSelect.onchange = function(){
+            update(data);
         }
+
+        d3.interval( () => {
+            day = (day + 1) % 101;
+            update(data)
+        }, 500);
         update(data);
     })()
 
