@@ -3,6 +3,8 @@ import Layout from "../layouts/Layout.astro";
 import DowntimeGraph from "../graphs/DowntimeGraph.astro";
 import PieGraph from "../graphs/PieGraph.astro";
 import ItemsPerWS from "../graphs/ItemsPerWS.astro";
+import DowntimeItemsScatter from "../graphs/DowntimeItemsScatter.astro";
+import TimeScatter from "../graphs/TimeScatter.astro";
 ---
 
 <Layout>
@@ -10,6 +12,8 @@ import ItemsPerWS from "../graphs/ItemsPerWS.astro";
         <DowntimeGraph width={500} height={500} />
         <PieGraph width={500} height={500} />
         <ItemsPerWS width={500} height={500} />
+        <DowntimeItemsScatter width ={500} height={500} />
+        <TimeScatter width ={500} height={500} />
     </div>
 </Layout>
 
