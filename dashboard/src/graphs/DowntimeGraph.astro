@@ -1,14 +1,17 @@
 ---
 const { width, height } = Astro.props;
 ---
+<style define:vars={{width, height}}>
+    #downtime-graph{
+        width: var(--width);
+        height: var(--height);
+    }
+</style>
 
-<div id="downtime-graph" width={width} height={height}></div> 
+<div id="downtime-graph"></div> 
 
-<script>
-    const SVG_DOM= document.querySelector("#downtime-graph");
-    const { SVG_WIDTH, SVG_HEIGHT } = SVG_DOM.getBBox();
-
-    const SVG = d3.select("#downtime-graph").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
+<script define:vars={{width, height}}>
+    const SVG = d3.select("#downtime-graph").attr("width", width).attr("height", height);
     const margin = { left: 100, right: 10, top: 10, bottom: 100};
     
     (async ()=>{
