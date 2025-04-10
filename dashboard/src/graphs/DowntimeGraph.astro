@@ -27,7 +27,7 @@ const { width, height } = Astro.props;
         .attr("y", margin.top / 2)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
-        .style("fill", d3.color("#000"))
+        .style("fill", d3.color(Colors.BLACK))
         .text("Top 10 Days With Downtimes");
         
     const dayLabel = group.append("text").attr("class", "label")
@@ -35,7 +35,7 @@ const { width, height } = Astro.props;
         .attr("y", HEIGHT - 40)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
-        .style("fill", d3.color("#ccc"))
+        .style("fill", d3.color(Colors.GREY))
         .text("Day");
 
     const numDayLabel = group.append("text").attr("class", "label")
@@ -43,7 +43,7 @@ const { width, height } = Astro.props;
         .attr("y", HEIGHT)
         .attr("font-size", "40px")
         .attr("text-anchor", "middle")
-        .style("fill", d3.color("#ccc"))
+        .style("fill", d3.color(Colors.GREY))
         .text("0");
 
 
@@ -113,7 +113,7 @@ const { width, height } = Astro.props;
             .attr("x", margin.left + 2)
             .attr("width", (d) => { return x(d.downtime)}) 
             .attr("height", y.bandwidth())
-            .attr("fill", d3.color("#0099FF"));
+            .attr("fill", d3.color(Colors.BLUE));
 
         const xAxisCall = d3.axisBottom(x).ticks(4);
         const yAxisCall = d3.axisLeft(y).tickValues(names);
