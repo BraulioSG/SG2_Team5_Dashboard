@@ -1,6 +1,7 @@
 ---
 import Slide1 from "./slides/Slide1.astro";
 import DowntimeSlide from "./slides/DowntimeSlide.astro";
+import WorkStationsDowntimes from "./slides/WorkStationsDowntimes.astro";
 ---
 
 <style>
@@ -39,8 +40,8 @@ import DowntimeSlide from "./slides/DowntimeSlide.astro";
 
 <section id="slides-section" data-aos="fade-up">
     <div class="tabs">
-        <button class="btn-tab active">Slide 1</button>
-        <button class="btn-tab">Slide 2</button>
+        <button class="btn-tab active">Downtime over the days</button>
+        <button class="btn-tab">Downtime per work station</button>
         <button class="btn-tab">Slide 3</button>
         <button class="btn-tab">Slide 4</button>
         <button class="btn-tab">Slide 5</button>
@@ -48,7 +49,7 @@ import DowntimeSlide from "./slides/DowntimeSlide.astro";
     </div>
 
     <DowntimeSlide />
-    <Slide1 />
+    <WorkStationsDowntimes />
     <Slide1 />
     <Slide1 />
     <Slide1 />

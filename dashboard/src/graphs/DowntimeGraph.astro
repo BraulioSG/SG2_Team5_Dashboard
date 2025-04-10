@@ -53,6 +53,8 @@ const { width, height } = Astro.props;
 
     let stop = false;
 
+    let prev_limit = 0;
+
     (async ()=>{
         const raw = await d3.csv("/data/results.csv")
 
@@ -78,6 +80,7 @@ const { width, height } = Astro.props;
         }) 
 
         d3.interval(() => {
+            if(sessionStorage.getItem("Downtime-pause") === "false") return;
             if(stop) return;
 
             const data = Object.values(daysDowntime);
@@ -87,7 +90,10 @@ const { width, height } = Astro.props;
                 return b.downtime - a.downtime
             });
 
-            updateData(sorted.slice(0, Math.min(idx, 20)));
+            const limit = document.querySelector("select#Downtime-top-selector").value;
+
+            titleLabel.text(`Top ${limit} Days With Downtimes`);
+            updateData(sorted.slice(0, Math.min(idx, limit)), limit);
             numDayLabel.text(idx + 1);
             idx++;
             if(idx >= data.length){
@@ -98,7 +104,7 @@ const { width, height } = Astro.props;
     })()
 
 
-    function updateData(data){
+    function updateData(data, limit = prev_limit){
         let maxDowntime = 0;
         const names = data.map(d => d.day);
         
@@ -109,12 +115,17 @@ const { width, height } = Astro.props;
 
 
 
+
         x.domain([maxDowntime, 0]);
         y.domain(names.reverse());
 
         const tran = d3.transition().duration(1000);
         const rects = group.selectAll("rect").data(data);
         
+        if(prev_limit !== limit){
+            group.selectAll("rect").remove();
+            prev_limit = limit;
+        }
         rects.exit().transition(tran).remove();
 
         rects.transition(tran)

@@ -1,5 +1,6 @@
 ---
 import Slide from "../../layouts/Slide.astro";
+import TimeScatter from "../../graphs/TimeScatter.astro";
 import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
 ---
 <style is:global>
@@ -8,7 +9,7 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
         border: 1px solid black;
         padding: 10px;
     }
-    #DowntimeSlide{
+    .slide-content{
         width: 100%;
         height: 100%;
         display: flex;
@@ -18,14 +19,14 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
         position: relative;
     }
 
-    #DowntimeSlide .info, #DowntimeSlide .graphics{
+    .slide-content .info, .slide-content .graphics{
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-content: center;
     }
-    #DowntimeSlide .info{
+    .slide-content .info{
         width: 50%;
         height: 100%;
         align-items: center;
@@ -34,10 +35,11 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
         flex-direction: column;
     }
 
-    #DowntimeSlide .info .info-summary{
+    .slide-content .info .info-summary{
         width: 100%;
         max-height: 500;
         overflow: hidden;
+        padding: 20px 0;
     }
 
     #DowntimeSlide .info .info-summary .entries{
@@ -46,17 +48,49 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
         width: 100%;
         overflow-y: scroll;
     }
-    #DowntimeSlide .graphics{
+    .slide-content .graphics{
         width: 50%;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        padding: 40px;
     }
-    #DowntimeSlide .info h1{
+    .slide-content .info h1{
         width: 100%;
         height: 10%;
+    }
+    .slide-content .info p{
+        width: 100%;
+    }
+    .slide-content .toolbar{
+        position: absolute;
+        top: 0;
+        right: 40px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .slide-content select{
+        display: inline-block;
+        width: 150px;
+        font-size: 1.5rem;
+        height: 100%;
+        text-align: center;
+    }
+    .slide-content .play-btn{
+        background: var(--orange);
+        padding: 10px 15px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .slide-content .play-btn:hover{
+        cursor: pointer;
+        transform: scale(1.05);
     }
     #DowntimeSlide .info .info-entry{
         width: 100%;
@@ -106,27 +140,44 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
             opacity: 1;
             transform: translateY(0%);
         }
-        }
     }
 </style>
 <Slide>
     <main id="DowntimeSlide" class="slide-content"> 
         <div class="info">
             <h1>Downtime over the days</h1>
+            <p>A brief description of this section</p>
             <div class="info-summary">
                 <div class="entries" id="DowntimeSlide-info-entries">
                 </div>
             </div>
         </div>
         <div class="graphics">
-            <DowntimeGraph  width={500} height={600}/>
+            <DowntimeGraph width={500} height={600}/>
+        </div>
+        <div class="toolbar">
+            <button class="play-btn" id="Downtime-play-btn">Pause</button>
+            <label for="top"><strong>Top: </strong></label>
+            <select id="Downtime-top-selector" name="top">
+              <option value=10 selected>10</option>
+              <option value=25 >25</option>
+              <option value=50 >50</option>
+              <option value=100 >100</option>
+            </select>
         </div>
     </main>
 </Slide>
 <script>
     const infoSummary = document.querySelector("div#DowntimeSlide-info-entries"); 
     let idx = 0;
-    console.log(infoSummary.innerHTML);
+
+    sessionStorage.setItem("Downtime-pause", "true");
+
+    document.querySelector("button#Downtime-play-btn").addEventListener("click", () => {
+        const isPlaying = sessionStorage.getItem("Downtime-pause") === "true";
+        sessionStorage.setItem("Downtime-pause", isPlaying ? "false" : "true");
+        document.querySelector("button#Downtime-play-btn").innerText = isPlaying ? "Play" : "Pause";
+    })
 
     function addInfoEntry(ws1, ws2, ws3, ws4, ws5, ws6){
         const sum = (+ws1.Downtime) + (+ws2.Downtime) + (+ws3.Downtime)+ (+ws4.Downtime) + (+ws5.Downtime) + (+ws6.Downtime);
@@ -152,19 +203,23 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
         infoSummary.scrollTop = infoSummary.scrollHeight;
     }
     (async ()=>{
-       const raw = await d3.csv("/data/results.csv")
-           const interval = setInterval(() => {
-           const ws1 = raw[idx + 0];
-           const ws2 = raw[idx + 1];
-           const ws3 = raw[idx + 2];
-           const ws4 = raw[idx + 3];
-           const ws5 = raw[idx + 4];
-           const ws6 = raw[idx + 5];
-           addInfoEntry(ws1, ws2, ws3, ws4, ws5, ws6);
-           idx += 6;
-           if(idx >= raw.length){
-               clearInterval(interval);
-           }
+        const raw = await d3.csv("/data/results.csv")
+        const interval = setInterval(() => {
+               if(sessionStorage.getItem("Downtime-pause") === "false") return;
+
+               const ws1 = raw[idx + 0];
+               const ws2 = raw[idx + 1];
+               const ws3 = raw[idx + 2];
+               const ws4 = raw[idx + 3];
+               const ws5 = raw[idx + 4];
+               const ws6 = raw[idx + 5];
+               addInfoEntry(ws1, ws2, ws3, ws4, ws5, ws6);
+               idx += 6;
+
+               if(idx >= raw.length)
+                   clearInterval(interval);
        }, 1000)
     })() 
+
+    
 </script>

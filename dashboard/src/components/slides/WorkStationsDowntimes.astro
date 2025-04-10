@@ -1,0 +1,46 @@
+---
+import Slide from "../../layouts/Slide.astro";
+import TimeScatter from "../../graphs/TimeScatter.astro";
+---
+<style>
+    #TimeScatter .toolbar select{
+        width: 200px;
+    }
+</style>
+<Slide>
+    <main id="TimeScatter" class="slide-content"> 
+        <div class="toolbar">
+            <button class="play-btn" id="timescatter-play-btn">Pause</button>
+            <label for="top"><strong>Top: </strong></label>
+            <select id="work-select" name="top">
+                <option>Company level</option>
+                <option>WS#1@PL#1</option>
+                <option>WS#2@PL#1</option>
+                <option>WS#3@PL#1</option>
+                <option>WS#4@PL#1</option>
+                <option>WS#5@PL#1</option>
+                <option>WS#6@PL#1</option>
+            </select>
+        </div>
+        <div class="info">
+            <h1>Downtime Per Workstation</h1>
+            <p>A brief description of this section</p>
+            <div class="info-summary">
+                <div class="entries" id="DowntimeSlide-info-entries">
+                </div>
+            </div>
+        </div>
+        <div class="graphics">
+            <TimeScatter width={500} height={500}/>
+        </div>
+    </main>
+</Slide>
+<script>
+    sessionStorage.setItem("timescatter-pause", "true");
+
+    document.querySelector("button#timescatter-play-btn").addEventListener("click", () => {
+        const isPlaying = sessionStorage.getItem("timescatter-pause") === "true";
+        sessionStorage.setItem("timescatter-pause", isPlaying ? "false" : "true");
+        document.querySelector("button#timescatter-play-btn").innerText = isPlaying ? "Play" : "Pause";
+    })
+</script>

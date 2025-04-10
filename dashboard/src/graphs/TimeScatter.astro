@@ -1,33 +1,15 @@
 ---
 const { width, height } = Astro.props;
 ---
-<style define:vars={{width, height}}>
-    #time-graph{
-        width: var(--width);
-        height: var(--height);
-    }
-</style>
-
-<div id="time-scatter">
-    <!---h2 id = "dayLabel">Day: 1</h2>
-    <input type="range" min="1" max="100" value="1" class="slider" id="dayRange"-->
-    <select id="work-select">
-        <option>Company level</option>
-        <option>WS#1@PL#1</option>
-        <option>WS#2@PL#1</option>
-        <option>WS#3@PL#1</option>
-        <option>WS#4@PL#1</option>
-        <option>WS#5@PL#1</option>
-        <option>WS#6@PL#1</option>
-    </select>
-    <div id="time-scatter-graph"></div>
+<div class="chart-container">
+    <div id="time-scatter-graph" class="chart-area"></div>
 </div>
 
 <script define:vars={{width, height}}>
 
     //Define D3 variables
     const margin = { left: 100, right: 10, top: 10, bottom: 100};
-    const SVG = d3.select("#time-scatter-graph").append("svg").attr("width", width).attr("height", height);
+    const SVG = d3.select("#time-scatter-graph").append("svg").attr("viewBox", `0,0, ${width}, ${height}`);
     const group = SVG.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
 
     const HEIGHT = height - margin.top - margin.bottom;
@@ -74,7 +56,8 @@ const { width, height } = Astro.props;
         .range(customColors);
 
     //Define filter variables
-    let filterSelect = document.getElementById("work-select");
+    const filterSelect = document.querySelector("select#work-select");
+    console.log(filterSelect);
 
     //Updates the graph
     function update(data){
@@ -186,6 +169,7 @@ const { width, height } = Astro.props;
         }
 
         d3.interval( () => {
+            if(sessionStorage.getItem("timescatter-pause") === "false") return;
             day = (day + 1) % 101;
             update(data)
         }, 500);
