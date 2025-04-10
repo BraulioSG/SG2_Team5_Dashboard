@@ -1,0 +1,52 @@
+<style>
+    .welcome-section{
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .welcome-title{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .welcome-title h1, .welcome-title h2{
+        display: inline-block;
+        text-align: center;
+        animation-name: appear;
+        animation-duration: 2s;
+        padding: 0;
+        margin: 0;
+    }
+
+    .welcome-title a{
+        width: fit-content;
+        height: fit-content;
+        animation-name: appear;
+        animation-duration: 2s;
+    }
+
+    @keyframes appear{
+        from{
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+<section class="welcome-section">
+    <div class="welcome-title">
+        <h1> Manufacturing Simulation Results </h1>
+        <h2> An interactive Dashboard </h2>
+        <a href="#slides-section" class="btn-cta"> see results </a>
+    </div>
+</section>
