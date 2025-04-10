@@ -64,28 +64,22 @@ const { width, height } = Astro.props;
     .attr("y", margin.top / 2)
     .attr("font-size", "20px")
     .attr("text-anchor", "middle")
-    .text("Total Items per Workstations");
-  const dayLabel = group
-    .append("text")
-    .attr("x", WIDTH)
-    .attr("y", HEIGHT - 40)
-    .attr("font-size", "20px")
-    .attr("text-anchor", "middle")
-    .text("Workstation");
+    .text("Avg Prod Time per Workstations ");
+
   const dayKeyLabel = group
     .append("text")
     .attr("x", margin.left + WIDTH / 2)
     .attr("y", margin.top / 2 + 25)
     .attr("font-size", "16px")
     .attr("text-anchor", "middle")
-    .text("day1");
+    .text("");
   let idx = 0;
   let dayKeys = [];
 
   function update(data, currentDay) {
     let maxItems = 0;
     data.forEach((d) => {
-      if (d.totalItems > maxItems) maxItems = d.totalItems;
+      if (d.avgTime > maxItems) maxItems = d.avgTime;
     });
     x.domain([maxItems, 0]);
     y.domain(data.map((d) => d.ws));
@@ -97,7 +91,7 @@ const { width, height } = Astro.props;
       .attr("y", (d) => y(d.ws) + margin.top)
       .attr("x", margin.left + 2)
       .attr("height", y.bandwidth())
-      .attr("width", (d) => x(d.totalItems))
+      .attr("width", (d) => x(d.avgTime))
       .attr("fill", (d) => colorScale(d.ws));
 
     rects
@@ -106,7 +100,7 @@ const { width, height } = Astro.props;
       .transition(t)
       .attr("y", (d) => y(d.ws) + margin.top)
       .attr("x", margin.left + 2)
-      .attr("width", (d) => x(d.totalItems))
+      .attr("width", (d) => x(d.avgTime))
       .attr("height", y.bandwidth())
       .attr("fill", (d) => colorScale(d.ws));
 
@@ -119,10 +113,10 @@ const { width, height } = Astro.props;
     idx = (idx + 1) % dayKeys.length;
     const dayKey = dayKeys[idx];
     const rawData = Object.entries(daysItems[dayKey]).map(([ws, t]) => ({
-      ws: ws.slice(0, 5),
-      totalItems: t,
+      ws,
+      avgTime: t,
     }));
-    const sorted = rawData.sort((a, b) => a.totalItems - b.totalItems);
+    const sorted = rawData.sort((a, b) => a.avgTime - b.avgTime);
     update(sorted.slice(0, 10), dayKey);
   }
 
@@ -132,16 +126,15 @@ const { width, height } = Astro.props;
     raw.forEach((r) => {
       const k = "Day" + r.Day;
       if (!daysItems[k]) daysItems[k] = {};
-      if (!daysItems[k][r["Work Station"]]) daysItems[k][r["Work Station"]] = 0;
-      daysItems[k][r["Work Station"]] += +r["Total items"];
+      daysItems[k][r["Work Station"]] = +r["Avg. Production Time WS"];
     });
     dayKeys = Object.keys(daysItems);
     const firstKey = dayKeys[idx];
     const initial = Object.entries(daysItems[firstKey]).map(([ws, t]) => ({
-      ws,
-      totalItems: t,
+      ws: ws.slice(0, 5),
+      avgTime: t,
     }));
-    const sorted = initial.sort((a, b) => a.totalItems - b.totalItems);
+    const sorted = initial.sort((a, b) => a.avgTime - b.avgTime);
     update(sorted.slice(0, 10), firstKey);
 
     $("#play-button").on("click", function () {
@@ -164,9 +157,9 @@ const { width, height } = Astro.props;
       const dayKey = dayKeys[idx];
       const rawData = Object.entries(daysItems[dayKey]).map(([ws, t]) => ({
         ws,
-        totalItems: t,
+        avgTime: t,
       }));
-      const sorted = rawData.sort((a, b) => a.totalItems - b.totalItems);
+      const sorted = rawData.sort((a, b) => a.avgTime - b.avgTime);
       update(sorted.slice(0, 10), dayKey);
       $("#day-slider").slider("value", 0);
       $("#day-label").text(1);
@@ -181,9 +174,9 @@ const { width, height } = Astro.props;
         const dk = dayKeys[idx];
         const rawData = Object.entries(daysItems[dk]).map(([ws, t]) => ({
           ws,
-          totalItems: t,
+          avgTime: t,
         }));
-        const sorted = rawData.sort((a, b) => a.totalItems - b.totalItems);
+        const sorted = rawData.sort((a, b) => a.avgTime - b.avgTime);
         update(sorted.slice(0, 10), dk);
         $("#day-label").text(idx + 1);
       },
