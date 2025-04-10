@@ -91,14 +91,14 @@ const { width, height } = Astro.props;
         .attr("y", 40)
         .text(`Aprobados: ${aprovedItems}`)
         .style("font-size", "14px")
-        .style("fill", "green");
+        .style("fill", Colors.GREEN);
 
       infoPanel
         .append("text")
         .attr("y", 60)
         .text(`Rechazados: ${rejectedItems}`)
         .style("font-size", "14px")
-        .style("fill", "#e63946");
+        .style("fill", Colors.RED);
     }
     cycleData();
     setInterval(cycleData, 1000);
@@ -125,7 +125,7 @@ const { width, height } = Astro.props;
         this._current = findNeighborArc(i, data0, data1, key) || d;
       })
       .attr("fill", (d) =>
-        d.data.region === "Rechazados" ? "#e63946" : "green"
+        d.data.region === "Rechazados" ? Colors.RED : Colors.GREEN
       )
       .transition()
       .duration(750)
