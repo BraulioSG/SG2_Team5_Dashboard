@@ -1,22 +1,13 @@
 # The Manufactoring facility
 
 ## Requirements
+Go to the `/simulator` folder and execute the following command
 ```ps
 pip install -r requirements.txt
 ```
 
-## Run the simulation
-To run a simulation use the following command
+## Run the dashboard
+The following command will execute a simulation and generate a report, then it will start the dashboard in dev mode
 ```ps
-python simulation/app.py
+./run.bat
 ```
-
-it will print the results of the simulation: ProductionLineId, items acepted, items, rejected, WorkstationId, avg fixing time, avg supply time, avg ws production time, and avg pl production time
-
-
-## Generate a report
-run the following command
-```ps
-./simulation/summary.bat
-```
-and it will generate an output file `output.csv`
