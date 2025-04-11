@@ -1,7 +1,6 @@
 # The Manufactoring facility
 
 ## Requirements
-Go to the `/simulator` folder and execute the following command
 ```ps
 pip install -r requirements.txt
 ```
