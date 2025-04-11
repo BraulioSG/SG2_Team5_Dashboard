@@ -77,26 +77,26 @@ const { width, height } = Astro.props;
       infoPanel
         .append("text")
         .attr("y", 0)
-        .text(`Día: ${currentDay}`)
+        .text(`Day: ${currentDay}`)
         .style("font-size", "24px");
 
       infoPanel
         .append("text")
         .attr("y", 20)
-        .text(`Estación: ${station.workstation}`)
+        .text(`WorkStation: ${station.workstation}`)
         .style("font-size", "14px");
 
       infoPanel
         .append("text")
         .attr("y", 40)
-        .text(`Aprobados: ${aprovedItems}`)
+        .text(`Approved: ${aprovedItems}`)
         .style("font-size", "14px")
         .style("fill", Colors.GREEN);
 
       infoPanel
         .append("text")
         .attr("y", 60)
-        .text(`Rechazados: ${rejectedItems}`)
+        .text(`Rejected: ${rejectedItems}`)
         .style("font-size", "14px")
         .style("fill", Colors.RED);
     }

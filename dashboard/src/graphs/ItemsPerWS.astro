@@ -3,14 +3,6 @@ const { width, height } = Astro.props;
 ---
 
 <div class="chart-container">
-  <div>
-    <div id="slider-div">
-      <label>Dia: <span id="day-label">1</span></label>
-      <div id="day-slider"></div>
-    </div>
-    <button id="play-button">Play</button>
-    <button id="reset-button">Reset</button>
-  </div>
   <div id="items-per-ws" class="chart-area"></div>
 </div>
 
@@ -65,14 +57,8 @@ const { width, height } = Astro.props;
     .attr("font-size", "20px")
     .attr("text-anchor", "middle")
     .text("Total Items per Workstations");
-  const dayLabel = group
-    .append("text")
-    .attr("x", WIDTH)
-    .attr("y", HEIGHT - 40)
-    .attr("font-size", "20px")
-    .attr("text-anchor", "middle")
-    .text("Workstation");
-  const dayKeyLabel = group
+
+ const dayKeyLabel = group
     .append("text")
     .attr("x", margin.left + WIDTH / 2)
     .attr("y", margin.top / 2 + 25)
@@ -81,6 +67,7 @@ const { width, height } = Astro.props;
     .text("day1");
   let idx = 0;
   let dayKeys = [];
+
 
   function update(data, currentDay) {
     let maxItems = 0;
@@ -126,6 +113,9 @@ const { width, height } = Astro.props;
     update(sorted.slice(0, 10), dayKey);
   }
 
+  const slider = document.querySelector("input[type=range]#itemsperws-range");
+
+
   (async () => {
     const raw = await d3.csv("/data/results.csv");
     const daysItems = {};
@@ -136,57 +126,29 @@ const { width, height } = Astro.props;
       daysItems[k][r["Work Station"]] += +r["Total items"];
     });
     dayKeys = Object.keys(daysItems);
-    const firstKey = dayKeys[idx];
-    const initial = Object.entries(daysItems[firstKey]).map(([ws, t]) => ({
-      ws: ws.slice(0, 5),
-      totalItems: t,
-    }));
-    const sorted = initial.sort((a, b) => a.totalItems - b.totalItems);
-    update(sorted.slice(0, 10), firstKey);
 
-    $("#play-button").on("click", function () {
-      if (!playing) {
-        $(this).text("Pause");
-        interval = setInterval(() => step(daysItems), 500);
-        playing = true;
-      } else {
-        $(this).text("Play");
-        clearInterval(interval);
-        playing = false;
-      }
-    });
-
-    $("#reset-button").on("click", function () {
-      idx = 0;
-      playing = false;
-      $("#play-button").text("Play");
-      clearInterval(interval);
-      const dayKey = dayKeys[idx];
-      const rawData = Object.entries(daysItems[dayKey]).map(([ws, t]) => ({
-        ws,
-        totalItems: t,
-      }));
-      const sorted = rawData.sort((a, b) => a.totalItems - b.totalItems);
-      update(sorted.slice(0, 10), dayKey);
-      $("#day-slider").slider("value", 0);
-      $("#day-label").text(1);
-    });
-
-    $("#day-slider").slider({
-      min: 0,
-      max: dayKeys.length - 1,
-      step: 1,
-      slide: (event, ui) => {
-        idx = ui.value;
-        const dk = dayKeys[idx];
-        const rawData = Object.entries(daysItems[dk]).map(([ws, t]) => ({
-          ws,
+    slider.addEventListener("input", () => {
+        idx = slider.value;
+        const firstKey = dayKeys[idx];
+        const initial = Object.entries(daysItems[firstKey]).map(([ws, t]) => ({
+          ws: ws.slice(0, 5),
           totalItems: t,
         }));
-        const sorted = rawData.sort((a, b) => a.totalItems - b.totalItems);
-        update(sorted.slice(0, 10), dk);
-        $("#day-label").text(idx + 1);
-      },
-    });
+        const sorted = initial.sort((a, b) => a.totalItems - b.totalItems);
+        slider.value = idx;
+        update(sorted.slice(0, 10), firstKey);
+    })
+    d3.interval(() => {
+        if(sessionStorage.getItem("itemsperws-pause") === "true") return;
+        const firstKey = dayKeys[idx];
+        const initial = Object.entries(daysItems[firstKey]).map(([ws, t]) => ({
+          ws: ws.slice(0, 5),
+          totalItems: t,
+        }));
+        const sorted = initial.sort((a, b) => a.totalItems - b.totalItems);
+        slider.value = idx;
+        update(sorted.slice(0, 10), firstKey);
+        idx++;
+    }, 1000);
   })();
 </script>

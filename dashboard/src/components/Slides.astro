@@ -4,6 +4,8 @@ import DowntimeSlide from "./slides/DowntimeSlide.astro";
 import WorkStationsDowntimes from "./slides/WorkStationsDowntimes.astro";
 import PieGraphSlide from "./slides/PieChartSlide.astro";
 import DowntimeItemsScatterSlide from "./slides/DowntimeItemsSlide.astro";
+import ItemsPerWorkshop from "./slides/ItemsPerWorkshop.astro";
+import Conclusion from "./slides/Conclusion.astro";
 ---
 
 <style>
@@ -46,6 +48,7 @@ import DowntimeItemsScatterSlide from "./slides/DowntimeItemsSlide.astro";
         <button class="btn-tab">Downtime per work station</button>
         <button class="btn-tab">Approval Rate</button>
         <button class="btn-tab">Downtime vs Total items</button>
+        <button class="btn-tab">Items Per Workshop</button>
         <button class="btn-tab">Conclusions</button>
     </div>
 
@@ -53,7 +56,8 @@ import DowntimeItemsScatterSlide from "./slides/DowntimeItemsSlide.astro";
     <WorkStationsDowntimes />
     <PieGraphSlide />
     <DowntimeItemsScatterSlide />
-    <Slide1 />
+    <ItemsPerWorkshop />
+    <Conclusion />
 
 </section>
 

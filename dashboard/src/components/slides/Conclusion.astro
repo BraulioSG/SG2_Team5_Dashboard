@@ -1,0 +1,24 @@
+---
+import Slide from "../../layouts/Slide.astro";
+---
+<Slide>
+    <main id="ConclusionSlide" class="slide-content"> 
+        <div class="info">
+            <h1>Conclusions</h1>
+            <p>Throughout the process of figuring out what was going wrong we could figure out little by little the way for telling the best story we could to take the audience through the same experience of what we had. First we checked the downtime by day in the workstations and it gave an unusually big time. So then we  needed to check in which part of the downtime were the machines getting stuck, either on the fixing time or in the supplying time. In the graph we could easily see that the tendency of the workstations is to get stuck on the supplying time. After that we needed to see if there was a problem with the products so we made the Pie chart to contrast the Approval rate vs the Rejected rate.</p>
+        </div>
+        <div class="graphics">
+            <img src="/assets/drawing.svg" />
+        </div>
+    </main>
+</Slide>
+<script>
+    sessionStorage.setItem("piechart-pause", "true");
+
+    document.querySelector("button#piechart-play-btn").addEventListener("click", () => {
+        const isPlaying = sessionStorage.getItem("piechart-pause") === "true";
+        sessionStorage.setItem("piechart-pause", isPlaying ? "false" : "true");
+        document.querySelector("button#piechart-play-btn").innerText = isPlaying ? "Play" : "Pause";
+        console.log("hello")
+    })
+</script>

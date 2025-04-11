@@ -1,0 +1,32 @@
+---
+import Slide from "../../layouts/Slide.astro";
+import ItemsPerWS from "../../graphs/ItemsPerWS.astro";
+---
+<Slide>
+    <main id="itemsPerWorkshop" class="slide-content"> 
+        <div class="toolbar">
+            <input type="range" id="itemsperws-range" min=0 max=100 step=1 value=0/>
+            <button class="play-btn" id="itemsperws-play-btn">Play</button>
+        </div>
+        <div class="info">
+            <h1>Items per workshop</h1>
+            <p>We compare all of the working stations with their respective amount of items made in a day and in that way we can know if all of our working stations are working as they should or if there is one getting worse that needs to get a check on what is happening there.</p>
+            <div class="info-summary">
+                <div class="entries" id="DowntimeSlide-info-entries">
+                </div>
+            </div>
+        </div>
+        <div class="graphics">
+            <ItemsPerWS width={500} height={500}/>
+        </div>
+    </main>
+</Slide>
+<script>
+    sessionStorage.setItem("itemsperws-pause", "true");
+
+    document.querySelector("button#itemsperws-play-btn").addEventListener("click", () => {
+        const isPlaying = sessionStorage.getItem("itemsperws-pause") === "true";
+        sessionStorage.setItem("itemsperws-pause", isPlaying ? "false" : "true");
+        document.querySelector("button#itemsperws-play-btn").innerText = !isPlaying ? "Play" : "Pause";
+    })
+</script>

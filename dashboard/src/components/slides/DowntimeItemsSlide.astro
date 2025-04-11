@@ -10,8 +10,8 @@ import DowntimeItemsScatter from "../../graphs/DowntimeItemsScatter.astro";
 <Slide>
     <main id="DowntimeItems" class="slide-content"> 
         <div class="toolbar">
-            <input type="range" id="timescatteritems-range" min=0 max=100 step=1/>
-            <button class="play-btn" id="timescatteritems-play-btn">Pause</button>
+            <input type="range" id="timescatteritems-range" value=0 min=0 max=100 step=1/>
+            <button class="play-btn" id="timescatteritems-play-btn">Play</button>
             <label for="top"><strong>Top: </strong></label>
             <select id="work-station-select" name="top">
                 <option>Company level</option>
@@ -25,7 +25,7 @@ import DowntimeItemsScatter from "../../graphs/DowntimeItemsScatter.astro";
         </div>
         <div class="info">
             <h1>Downtime vs Total items</h1>
-            <p>A brief description of this section</p>
+            <p>To identify a factor that had a direct relationship with item production, we needed to plot the item production against another factor. We decided to settle on downtime, since it would make sense that less production time impacts production itself. We generated a scatter plot comparing total items and downtime.</p>
             <div class="info-summary">
                 <div class="entries" id="DowntimeSlide-info-entries">
                 </div>
@@ -37,7 +37,7 @@ import DowntimeItemsScatter from "../../graphs/DowntimeItemsScatter.astro";
     </main>
 </Slide>
 <script>
-    sessionStorage.setItem("timescatteritems-pause", "true");
+    sessionStorage.setItem("timescatteritems-pause", "false");
 
     document.querySelector("button#timescatteritems-play-btn").addEventListener("click", () => {
         const isPlaying = sessionStorage.getItem("timescatteritems-pause") === "true";

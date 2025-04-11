@@ -11,7 +11,7 @@ import TimeScatter from "../../graphs/TimeScatter.astro";
     <main id="TimeScatter" class="slide-content"> 
         <div class="toolbar">
             <input type="range" id="timescatter-range" min=0 max=100 step=1/>
-            <button class="play-btn" id="timescatter-play-btn">Pause</button>
+            <button class="play-btn" id="timescatter-play-btn">Play</button>
             <label for="top"><strong>Top: </strong></label>
             <select id="work-select" name="top">
                 <option>Company level</option>
@@ -25,7 +25,7 @@ import TimeScatter from "../../graphs/TimeScatter.astro";
         </div>
         <div class="info">
             <h1>Downtime Per Workstation</h1>
-            <p>A brief description of this section</p>
+            <p>We wanted to analyze the main issue in production, as well as to identify if any of the workstations had a larger impact on the production rate. Since we concluded that downtime has a direct impact on production, we strived to break down what makes it up in order to determine what could be a cause for deficient production.</p>
             <div class="info-summary">
                 <div class="entries" id="DowntimeSlide-info-entries">
                 </div>

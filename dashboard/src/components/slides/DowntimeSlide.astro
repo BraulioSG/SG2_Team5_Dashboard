@@ -63,6 +63,7 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
     }
     .slide-content .info p{
         width: 100%;
+        font-size: 1.3rem;
     }
     .slide-content .toolbar{
         position: absolute;
@@ -156,7 +157,7 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
             <DowntimeGraph width={500} height={600}/>
         </div>
         <div class="toolbar">
-            <button class="play-btn" id="Downtime-play-btn">Pause</button>
+            <button class="play-btn" id="Downtime-play-btn">Play</button>
             <label for="top"><strong>Top: </strong></label>
             <select id="Downtime-top-selector" name="top">
               <option value=10 selected>10</option>
@@ -171,7 +172,7 @@ import DowntimeGraph from "../../graphs/DowntimeGraph.astro";
     const infoSummary = document.querySelector("div#DowntimeSlide-info-entries"); 
     let idx = 0;
 
-    sessionStorage.setItem("Downtime-pause", "true");
+    sessionStorage.setItem("Downtime-pause", "false");
 
     document.querySelector("button#Downtime-play-btn").addEventListener("click", () => {
         const isPlaying = sessionStorage.getItem("Downtime-pause") === "true";
